@@ -34,16 +34,18 @@ class ChangeStream {
 }
 
 const calibratedFrequency = (readings) => {
-    const observedFrequencies = [0];
+    const observedFrequencies = {
+        0: true
+    };
     const stream = new ChangeStream(readings);
     let change;
     let currentFrequency;
     while (change = stream.next()) {
         currentFrequency = calculateFrequency(currentFrequency || 0, change);
-        if (observedFrequencies.includes(currentFrequency)) {
+        if (observedFrequencies[currentFrequency] === true) {
             break;
         }
-        observedFrequencies.push(currentFrequency);
+        observedFrequencies[currentFrequency] = true;
     }
 
     return currentFrequency;
