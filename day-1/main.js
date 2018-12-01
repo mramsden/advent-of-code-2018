@@ -1,19 +1,9 @@
-const calculateFrequency = (currentFrequency, change) => {
-    if (change.charAt(0) === '+') {
-        const changeValue = parseInt(change.slice(1));
-        return currentFrequency + parseInt(changeValue);
-    }
-    if (change.charAt(0) === '-') {
-        const changeValue = parseInt(change.slice(1));
-        return currentFrequency - parseInt(changeValue);
-    }
-    return currentFrequency;
-};
+const calculateFrequency = (currentFrequency, change) =>
+    currentFrequency + parseInt(change);
 
 const calculateFrequencyDrift = (readings) =>
-    readings.split('\n').reduce((currentDrift, change) => {
-        return calculateFrequency(currentDrift, change.trim());
-    }, 0);
+    readings.split('\n').reduce((currentDrift, change) =>
+        calculateFrequency(currentDrift, change.trim()), 0);
 
 class ChangeStream {
 
@@ -57,10 +47,6 @@ module.exports = {
     calibratedFrequency
 };
 
-if (require.main !== module) {
-    return;
-}
-
 const readStdin = () => new Promise(resolve => {
     let input = '';
     process.stdin.resume();
@@ -75,4 +61,6 @@ const readStdin = () => new Promise(resolve => {
     });
 });
 
-readStdin().then(input => console.log(calibratedFrequency(input)));
+if (require.main === module) {
+    readStdin().then(input => console.log(calibratedFrequency(input)));
+}
