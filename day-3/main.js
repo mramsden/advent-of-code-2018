@@ -27,9 +27,18 @@ class Claim {
         });
         return coordinates;
     }
+
+    isUniqueClaim(coordinates) {
+        for (let usedCoordinate of this.usedCoordinates) {
+            if (coordinates[usedCoordinate] !== 1) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
-const overlappedSquareInches = claims => {
+const coordinateUsage = claims => {
     const overlaps = {};
     claims.forEach(claim => {
         claim.usedCoordinates.forEach(coordinates => {
@@ -40,7 +49,7 @@ const overlappedSquareInches = claims => {
             overlaps[coordinates] = 1;
         })
     });
-    return Object.keys(overlaps).reduce((count, key) => overlaps[key] > 1 ? count + 1 : count, 0);
+    return overlaps;
 };
 
 const readStdin = () => new Promise(resolve => {
@@ -60,4 +69,13 @@ const readStdin = () => new Promise(resolve => {
 readStdin()
     .then(input => input.split('\n'))
     .then(claims => claims.map(claim => parseClaim(claim)))
-    .then(claims => console.log(overlappedSquareInches(claims)));
+    .then(claims => {
+        const overlaps = coordinateUsage(claims);
+        const overlapCount = Object.keys(overlaps).reduce((count, key) => overlaps[key] > 1 ? count + 1 : count, 0)
+        console.log(`Overlap count: ${overlapCount}`);
+        claims.forEach(claim => {
+            if (claim.isUniqueClaim(overlaps)) {
+                console.log(`Unique claim: ${claim.id}`);
+            }
+        })
+    });
