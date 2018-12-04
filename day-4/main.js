@@ -52,28 +52,20 @@ readStdin()
     .then(shifts => sortedShifts(shifts))
     .then(shifts => {
         let targetGuard;
-        let targetSleepTime;
-        const groupedShifts = groupGuardShifts(shifts);
-        
-        for (let guardId in groupedShifts) {
-            const sleepTime = groupedShifts[guardId].reduce((count, shift) =>
-                count + (shift.join('').match(/#/g) || []).length
-            , 0);
-            if (sleepTime > (targetSleepTime || 0)) {
-                targetGuard = guardId;
-                targetSleepTime = sleepTime;
-            }
-        }
-
         let targetTime;
         let overlaps;
+        const groupedShifts = groupGuardShifts(shifts);
+        
         for (var minute = 0; minute < 60; minute++) {
-            const count = groupedShifts[targetGuard].reduce((count, shift) => {
-                return count + (shift[minute] === '#' ? 1 : 0);
-            }, 0);
-            if (count > (overlaps || 0)) {
-                targetTime = minute;
-                overlaps = count;
+            for (let guardId in groupedShifts) {
+                const count = groupedShifts[guardId].reduce((count, shift) => {
+                    return count + (shift[minute] === '#' ? 1 : 0);
+                }, 0);
+                if (count > (overlaps || 0)) {
+                    targetGuard = guardId;
+                    targetTime = minute;
+                    overlaps = count;
+                }
             }
         }
         console.log(`Target Guard: ${targetGuard} Target Time: ${targetTime}`);
